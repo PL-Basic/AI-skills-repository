@@ -42,4 +42,13 @@
 如果说普通的代码生成更像是直接给出结果，那么 `learn-by-building` 更像是在结果之前多保留一段思考过程。它希望学习者最终获得的不是某一次功能的答案，而是下一次独立实现功能的能力。
 
 示例：
-<img width="1802" height="6476" alt="QQ_1782636500480" src="https://github.com/user-attachments/assets/89d91cb1-a1eb-45e3-a026-b6fb0a2abb49" />
+
+<img width="1792" height="930" alt="QQ_1782636622228" src="https://github.com/user-attachments/assets/7b84480d-9fc2-45bd-83c1-13826d863d52" />
+
+<img width="1792" height="1284" alt="QQ_1782636637520" src="https://github.com/user-attachments/assets/15eb93bf-a1ea-4e59-8e56-1af4d2c84fa1" />
+
+<img width="1803" height="1595" alt="QQ_1782636659228" src="https://github.com/user-attachments/assets/1d454ac6-f35f-4217-94b7-89c8318dce94" />
+
+<img width="1778" height="2513" alt="QQ_1782636684451" src="https://github.com/user-attachments/assets/7c5c3893-6a0f-4bf9-a0b8-a6b1ad087555" />
+
+
