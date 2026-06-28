@@ -1,4 +1,0 @@
-interface:
-  display_name: "Wifi Manager Backend"
-  short_description: "Work on the Wifi_Manager Java microservice backend."
-  default_prompt: "Use $wifi-manager-backend to inspect and extend the Wifi_Manager backend safely."
