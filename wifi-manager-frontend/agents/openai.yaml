@@ -1,0 +1,4 @@
+interface:
+  display_name: "Wifi Manager Frontend"
+  short_description: "Work on the Wifi Vue admin frontend."
+  default_prompt: "Use $wifi-manager-frontend to refine the Wifi Vue dashboard and frontend integration."

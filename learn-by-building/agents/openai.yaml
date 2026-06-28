@@ -1,0 +1,4 @@
+interface:
+  display_name: "Learn By Building"
+  short_description: "Practice designing features before writing code"
+  default_prompt: "Use $learn-by-building to help me restate the requirement, design the implementation route, write pseudocode, then compare and implement."
