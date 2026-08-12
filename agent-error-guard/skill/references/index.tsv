@@ -1,0 +1,2 @@
+id	category	date	title	signature	repository	record	keywords
+ERR-20000101-001	agent-tooling	2000-01-01.	powershell-bash-or-operator	Windows PowerShell rejects `||` as an invalid statement separator.	Generic local shell example.	references/records/agent-tooling/ERR-20000101-001.md	agent-tooling powershell bash operator fixed string rg

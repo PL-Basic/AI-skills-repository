@@ -1,0 +1,21 @@
+{
+  "top_k": 8,
+  "session_top_k": 4,
+  "max_context_chars": 1800,
+  "max_hotset_updates": 3,
+  "max_session_context_chars": 3000,
+  "hotset_change_threshold": 2,
+  "hotset_min_prompt_interval": 2,
+  "probability_weight": 0.55,
+  "impact_weight": 0.45,
+  "task_similarity_weight": 0.38,
+  "environment_weight": 0.27,
+  "frequency_weight": 0.20,
+  "recency_weight": 0.15,
+  "metric_probability_weight": 0.35,
+  "max_metric_probability_blend": 0.3,
+  "basic_solution_priority_boost": 0.12,
+  "deny_unchanged_failed_command_hours": 2,
+  "profile_schema": 1,
+  "risk_index_schema": 1
+}
