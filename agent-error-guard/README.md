@@ -1,86 +1,81 @@
-# Agent Error Guard
+**Agent Error Guard（代理错误防护）**
+一个本地的、可解释的风险排序与重试保护扩展，专为 Codex 设计。它结合了单次主机概况、任务感知风险排序、有限会话热集更新、命令防护以及 MCP 接口。
 
-Agent Error Guard is a local, explainable risk-ranking and retry-protection
-extension for Codex. It combines a one-time host profile, task-aware risk
-ranking, bounded session hot-set updates, command guards, and an MCP interface.
+------
 
-## Introduction
+## 简介
 
-Coding agents often fail for reasons that are specific to the current machine
-and project: an unavailable tool, a locked file, a busy port, a destructive
-command, an unchanged retry, or a long operation that should have been stopped.
-General model knowledge cannot reliably predict these local conditions, while
-loading a complete error history into every conversation wastes context.
+编码代理经常因为当前机器和项目特有的原因而失败：工具不可用、文件被锁定、端口被占用、命令具有破坏性、重试未改变结果、或者长时间运行的操作本该被停止。通用模型知识无法可靠地预测这些本地条件，而将完整的错误历史加载到每次对话中又会浪费上下文。
 
-Agent Error Guard provides a small local safety layer between those two
-extremes. It keeps detailed error records outside the conversation, builds a
-one-time host profile, and ranks only the risks that are relevant to the
-current task. A bounded hot set gives Codex the most useful warnings before an
-operation, while command guards remain active after the context budget is
-exhausted.
+Agent Error Guard 在这两个极端之间提供了一个小巧的本地安全层。它将详细的错误记录保存在对话之外，构建一次主机概况，并仅对与当前任务相关的风险进行排序。有限的热集在操作前为 Codex 提供最有用的警告，而命令防护在上下文预算耗尽后仍然保持活跃。
 
-The tool learns from sharded runtime evidence without hiding its decisions.
-Each recommendation exposes its probability, impact, task similarity, and
-observed outcome signals. Simple, low-risk errors may link to one validated
-command in the basic-solution library, allowing the agent to use the known
-answer without turning a routine lookup into a larger debugging exercise.
+该工具从分片的运行时证据中学习，但不会隐藏其决策。每条建议都公开其概率、影响、任务相似度和观测结果信号。简单、低风险的错误可能关联到基础解决方案库中的一条已验证命令，从而使代理能够使用已知答案，而不会将常规查询演变为更大的调试工作。
 
-Agent Error Guard is not an autonomous repair system and does not bypass user
-approval, operating-system permissions, or project ownership rules. It is an
-offline, inspectable guardrail that helps coding agents avoid repeated,
-destructive, expensive, and locally predictable mistakes.
+Agent Error Guard 不是一个自动修复系统，也不会绕过用户审批、操作系统权限或项目所有权规则。它是一个离线的、可检查的防护栏，帮助编码代理避免重复的、破坏性的、昂贵的和本地可预测的错误。
 
-## Install
+------
 
-Requirements:
+## 安装
 
-- Python 3.10 or newer
-- Codex CLI on `PATH`
-- Python package `mcp` for the MCP server
+**要求：**
 
-Run:
+- Python 3.10 或更新版本
+- Codex CLI 在 PATH 中
+- Python 包 `mcp`（用于 MCP 服务器）
 
-```powershell
+**运行：**
+
+bash
+
+```
 python .\install.py --workspace C:\path\to\project
 ```
 
-The installer resolves the active Python executable and `CODEX_HOME` at runtime.
-On Windows it selects a fixed non-system drive for state by default. Override
-the location explicitly when needed:
 
-```powershell
-python .\install.py --state-dir <non-system-drive>:\AgentErrorGuard\state
+
+安装程序会在运行时解析当前使用的 Python 可执行文件和 `CODEX_HOME`。在 Windows 上，默认选择一个固定的非系统驱动器来存储状态。需要时可显式覆盖位置：
+
+bash
+
+```
+python .\install.py --state-dir <非系统驱动器>:\AgentErrorGuard\state
 ```
 
-Environment collection is explicit-only. It records operating-system and
-toolchain versions plus marker-based workspace types. It does not scan ports,
-services, credentials, source files, or entire drives.
 
-The installer creates the profile once. A later install preserves it. Refresh
-only after the host toolchain changes:
 
-```powershell
+环境收集是显式触发的。它记录操作系统和工具链版本，以及基于标记的工作区类型。它不会扫描端口、服务、凭据、源文件或整个驱动器。
+
+安装程序会创建一次主机概况。后续安装会保留该概况。仅当主机工具链发生变化后才刷新：
+
+bash
+
+```
 python .\install.py --refresh-profile --workspace C:\path\to\project
 ```
 
-## Context Behavior
 
-Codex currently cannot delete one previously injected context item by ID.
-Therefore the Hook never claims physical deletion. It injects:
 
-- one short host baseline at session start;
-- a versioned task hot set only when enough IDs change;
-- at most three task updates and 3000 task-context characters per session.
+------
 
-Each newer hot-set version semantically replaces older versions. After the
-budget is exhausted, command guards and MCP recommendations continue without
-adding prompt context.
+## 上下文行为
 
-## Evidence And Ranking
+Codex 目前无法按 ID 单独删除之前注入的上下文项。因此，Hook 不会声称执行了物理删除。它注入的是：
 
-Runtime evidence is stored outside the Skill as one JSON shard per risk ID:
+- 会话开始时的一条简短主机基线；
+- 仅当有足够多的 ID 发生变化时，才会注入带版本号的任务热集；
+- 每个会话最多三次任务更新，以及最多 3000 个任务上下文字符。
 
-```text
+每个较新的热集版本会在语义上替换较旧的版本。上下文预算耗尽后，命令防护和 MCP 建议会继续工作，而不会增加提示上下文。
+
+------
+
+## 证据与排序
+
+运行时证据存储在 Skill 外部的 JSON 分片中，每个风险 ID 对应一个文件：
+
+text
+
+```
 state/
   metrics/
     agent-tooling/
@@ -88,30 +83,26 @@ state/
         ERR-20000101-001.json
 ```
 
-The ranking model uses bounded Bayesian evidence from recommendations,
-confirmed triggers, observed failures, repeat failures, corrected successes,
-blocks, and solution outcomes. Evidence can adjust only a configured fraction
-of estimated probability, so sparse or noisy samples cannot dominate task,
-environment, recency, and impact signals.
 
-Basic solutions are deliberately narrow. One eligible error links to one
-non-destructive command of at most 240 characters. Chaining, redirection,
-deletion, database mutation, network publication, privilege escalation,
-destructive Git, and sensitive assignments are rejected.
 
-Use MCP `metrics` for compact totals and `solution` for one command. The agent
-does not load the entire metric or solution tree.
+排序模型使用有界贝叶斯证据，来源于建议、已确认的触发、观测到的失败、重复失败、修正后的成功、阻止和解决方案结果。证据只能调整估计概率的配置比例，因此稀疏或嘈杂的样本无法主导任务、环境、时效性和影响信号。
 
-`inferred_correction_rate` is based on a later successful, token-similar
-command after a recorded failure. It is operational evidence, not proof that
-the underlying issue was fully resolved. Use explicit `solution_succeeded`
-events for verified basic-solution outcomes.
+基础解决方案被刻意限制得较窄。一个符合条件的错误只能关联到一条非破坏性命令，且命令长度不超过 240 个字符。链接、重定向、删除、数据库变更、网络发布、提权、破坏性 Git 操作以及敏感赋值等均被拒绝。
 
-## Uninstall
+使用 MCP 的 `metrics` 端点可获取紧凑总计，使用 `solution` 端点获取单条命令。代理不会加载整个度量树或解决方案树。
 
-```powershell
+`inferred_correction_rate` 基于记录失败后某条成功且 Token 相似命令的后续表现。它是操作证据，而非表明根本问题已完全解决的证明。对于已验证的基础解决方案结果，请使用显式的 `solution_succeeded` 事件。
+
+------
+
+## 卸载
+
+bash
+
+```
 python .\uninstall.py
 ```
 
-Runtime state is retained by default. Set `AGENT_ERROR_GUARD_STATE` and add
-`--remove-state` only when that exact state directory should also be removed.
+
+
+运行时状态默认保留。仅当需要同时移除该确切的状态目录时，才设置 `AGENT_ERROR_GUARD_STATE` 并添加 `--remove-state` 参数。
